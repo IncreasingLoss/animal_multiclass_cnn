@@ -1,5 +1,6 @@
 @echo off
 setlocal enabledelayedexpansion
+set "BASE_DIR=%~dp0"
 
 :: 1. Pull git repo - if not pulled
 echo Checking for git repository...
@@ -23,17 +24,23 @@ if %errorlevel% neq 0 (
 echo Python detected.
 
 :: 3. Create new venv and pip install all from requirements.txt
-if not exist .venv (
+if not exist %BASE_DIR%.venv (
     echo Creating virtual environment...
-    python -m venv .venv
+    %BASE_DIR%python -m venv %BASE_DIR%.venv
 )
 
 echo Activating virtual environment...
-call .venv\Scripts\activate
+call %BASE_DIR%.venv\Scripts\activate
 
 echo Installing dependencies from requirements.txt...
-python -m pip install --upgrade pip
-pip install -r requirements.txt
+%BASE_DIR%.venv\Scripts\python.exe -m pip install --upgrade pip
+%BASE_DIR%.venv\Scripts\python.exe -m pip install -r requirements.txt
+
+:: 3.5 Pull models from Hugging Face if missing
+echo Checking for models...
+if not exist %BASE_DIR%models (
+    %BASE_DIR%.venv\Scripts\python.exe -c "from huggingface_hub import snapshot_download; snapshot_download(repo_id='IncreasingLoss/animal_multiclass_cnn', local_dir='%BASE_DIR%models')"
+)
 
 :: 4. Find if nvidia smi is available - then download right torch version
 echo Checking for NVIDIA GPU...

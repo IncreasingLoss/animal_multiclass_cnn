@@ -6,10 +6,12 @@ Training and evaluation pipeline for classifying wildlife images into multiple s
 
 Clone the repository and install dependencies from requirements.txt:
 
-```bash
-git clone https://github.com/IncreasingLoss/animal_multiclass_cnn.git
-cd animal-multiclass-cnn
-pip install -r requirements.txt
+```
+* download the windows installer 
+* place it in a desiered folder 
+* double click all installs will be done automatically
+* make sure you have admin rights to you machine
 ```
 
-Run training with `python Wildlife_Animal_Classifier/app.py` and view results in the `trainingpics/` directory.# animal_multiclass_cnn
+Run the app with `python Wildlife_Animal_Classifier/app.py` 
+and training with `python Wildlife_Animal_Classifier/MulticlassCNN_training_final.ipynb`

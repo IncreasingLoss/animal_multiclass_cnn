@@ -3,17 +3,20 @@ setlocal enabledelayedexpansion
 
 :: 1. Pull git repo - if not pulled
 echo Checking for git repository...
+git remote add origin https://github.com/IncreasingLoss/animal_multiclass_cnn.git 2>nul
+git remote set-url origin https://github.com/IncreasingLoss/animal_multiclass_cnn.git 2>nul
 git pull origin main
 if %errorlevel% neq 0 (
     echo Git pull failed or not a git repository. Proceeding anyway...
 )
 
-:: 2. Install python 3.14 if not installed
+
+:: 2. Check for Python (3.12.2 to 3.14)
 echo Checking for Python installation...
 python --version >nul 2>&1
 if %errorlevel% neq 0 (
     echo Python is not installed or not in PATH. 
-    echo Please install Python 3.14 from https://www.python.org/ and try again.
+    echo Please install Python (version 3.12.2 or newer) from https://www.python.org/ and try again.
     pause
     exit /b
 )

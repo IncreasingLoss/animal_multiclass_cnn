@@ -1,0 +1,2 @@
+the dataset used to train this model was https://cvml.ista.ac.at/AwA2/
+animals in the wild (awa)

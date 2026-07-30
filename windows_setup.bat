@@ -175,15 +175,44 @@ if %errorlevel% equ 0 (
     echo [i] No NVIDIA GPU detected - using the CPU build.
 )
 
-echo [i] Installing PyTorch (this can take a while)...
-python -m pip install --force-reinstall torch torchvision torchaudio --index-url !TORCH_URL!
-if !errorlevel! neq 0 (
-    echo [!] Install from !TORCH_URL! failed - retrying with the CPU build...
-    python -m pip install --force-reinstall torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+:: Which build tag are we targeting? (cpu / cu118 / cu124 / cu126 / cu128 / cu130)
+set "TORCH_TAG=!TORCH_URL:*whl/=!"
+
+:: What's already installed, if anything?
+set "TORCH_INSTALLED_TAG="
+del "%TEMP%\_torchver.txt" >nul 2>&1
+python -c "import torch; print(torch.__version__)" >"%TEMP%\_torchver.txt" 2>nul
+if !errorlevel! equ 0 (
+    set /p TORCH_FULL_VER=<"%TEMP%\_torchver.txt"
+    set "TORCH_INSTALLED_TAG="
+    for /f "tokens=2 delims=+" %%t in ("!TORCH_FULL_VER!") do set "TORCH_INSTALLED_TAG=%%t"
+    if not defined TORCH_INSTALLED_TAG set "TORCH_INSTALLED_TAG=cpu"
+)
+del "%TEMP%\_torchver.txt" >nul 2>&1
+
+set "NEED_TORCH=1"
+if defined TORCH_INSTALLED_TAG (
+    if "!TORCH_INSTALLED_TAG!"=="!TORCH_TAG!" (
+        echo [i] PyTorch already installed with the right build ^(!TORCH_TAG!^) - skipping.
+        set "NEED_TORCH=0"
+    ) else (
+        echo [i] Installed PyTorch build is "!TORCH_INSTALLED_TAG!" but "!TORCH_TAG!" is needed - reinstalling.
+    )
+) else (
+    echo [i] PyTorch not installed yet.
+)
+
+if "!NEED_TORCH!"=="1" (
+    echo [i] Installing PyTorch ^(this can take a while^)...
+    python -m pip install torch torchvision torchaudio --index-url !TORCH_URL!
     if !errorlevel! neq 0 (
-        echo [X] PyTorch install failed entirely. Aborting.
-        pause
-        exit /b 1
+        echo [!] Install from !TORCH_URL! failed - retrying with the CPU build...
+        python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+        if !errorlevel! neq 0 (
+            echo [X] PyTorch install failed entirely. Aborting.
+            pause
+            exit /b 1
+        )
     )
 )
 

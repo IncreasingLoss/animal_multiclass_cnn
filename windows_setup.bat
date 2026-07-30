@@ -253,16 +253,18 @@ if %errorlevel% neq 0 (
 :: ---------------------------------------------------------------------
 :: 7) Pull the model from Hugging Face if missing
 :: ---------------------------------------------------------------------
-if not exist "models" (
-    echo [i] Downloading model from Hugging Face...
-    python -c "from huggingface_hub import snapshot_download; snapshot_download(repo_id='IncreasingLoss/animal_multiclass_cnn', local_dir='models')"
+if not exist "models\MobileNet3_small_full.pth" (
+    echo [i] Downloading models from Hugging Face...
+    python -c "from huggingface_hub import hf_hub_download; hf_hub_download(repo_id='IncreasingLoss/animal_multiclass_cnn', filename='MobileNet3_small_full.pth', local_dir='models')"
+    python -c "from huggingface_hub import hf_hub_download; hf_hub_download(repo_id='IncreasingLoss/animal_multiclass_cnn', filename='MobileNet3_small_StateDictionary.pth', local_dir='models')"
+    
     if !errorlevel! neq 0 (
         echo [X] Model download failed. Check your connection / Hugging Face access and re-run.
         pause
         exit /b 1
     )
 ) else (
-    echo [i] "models" folder already exists - skipping download.
+    echo [i] Model files already exist - skipping download.
 )
 
 :: ---------------------------------------------------------------------
